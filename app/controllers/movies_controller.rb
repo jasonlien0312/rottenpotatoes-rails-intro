@@ -27,6 +27,11 @@ class MoviesController < ApplicationController
     else
       @movies = Movie.all
     end
+    #TODO: fix this
+    @all_ratings = ['G','PG','PG-13','R']
+    if params["ratings"]  && !params["ratings"].empty?
+      @movies = Movie.where(:rating => params["ratings"].keys )
+    end
   end
 
   def new
