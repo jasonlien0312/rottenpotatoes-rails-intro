@@ -9,12 +9,21 @@ class MoviesController < ApplicationController
     @movie = Movie.find(id) # look up movie by unique ID
     # will render app/views/movies/show.<extension> by default
   end
+  
+  helper_method :bg_color_class
+  def bg_color_class(str)
+    if params[:order] == str
+      'hilite'
+    end
+  end
 
   def index
     if params[:order] == "Title"
       @movies = Movie.order(:title)
+      #th = hilight or something
     elsif params[:order] == "Date"
       @movies = Movie.order(:release_date)
+      #th = hilite
     else
       @movies = Movie.all
     end
