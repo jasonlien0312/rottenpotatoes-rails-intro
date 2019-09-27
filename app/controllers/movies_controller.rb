@@ -16,8 +16,21 @@ class MoviesController < ApplicationController
       'hilite'
     end
   end
+  helper_method :rating_help
+  def rating_help(rating)
+    if params["ratings"] == nil
+      if !params[:submitted] #just entered page
+        true
+      else ################################################use intentionally unchecked everything
+        false
+      end
+    else# something was checked
+      params["ratings"].has_key?(rating)
+    end 
+  end
 
   def index
+    #TASK 1
     if params[:order] == "Title"
       @movies = Movie.order(:title)
       #th = hilight or something
@@ -27,10 +40,11 @@ class MoviesController < ApplicationController
     else
       @movies = Movie.all
     end
-    #TODO: fix this
-    @all_ratings = ['G','PG','PG-13','R']
+    
+    #TASK 2
+    @all_ratings = Movie.get_raitings #defined in Movie.rb
     if params["ratings"]  && !params["ratings"].empty?
-      @movies = Movie.where(:rating => params["ratings"].keys )
+      @movies = Movie.where(:rating => params["ratings"].keys)
     end
   end
 
