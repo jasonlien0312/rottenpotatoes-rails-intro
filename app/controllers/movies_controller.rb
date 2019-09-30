@@ -30,22 +30,35 @@ class MoviesController < ApplicationController
   end
 
   def index
-    #TASK 1
+    #rails s -p $PORT -b $IP
+# =begin
+    ##case1: empty movies
+    if @movies==nil
+      @movies = Movie.all
+    else
+      @movies = session[:movies]
+    end
+
+    ##case2: sorted movies
+    ##case3: filtered movies
+    
+    #TASK 1: sort
     if params[:order] == "Title"
       @movies = Movie.order(:title)
-      #th = hilight or something
     elsif params[:order] == "Date"
-      @movies = Movie.order(:release_date)
-      #th = hilite
-    else
-      @movies = Movie.all
+      @movies = Movie.order(:release_date) 
+    # else
+    #   @movies = Movie.all
     end
     
-    #TASK 2
+    #TASK 2: filter
     @all_ratings = Movie.get_raitings #defined in Movie.rb
     if params["ratings"]  && !params["ratings"].empty?
-      @movies = Movie.where(:rating => params["ratings"].keys)
+      @movies &= Movie.where(:rating => params["ratings"].keys)
     end
+    
+    session[:movies] = @movies
+# =end
   end
 
   def new
