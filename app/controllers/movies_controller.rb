@@ -60,44 +60,7 @@ class MoviesController < ApplicationController
     
     @movies = Movie.order(params[:order]).where(:rating => @slected_ratings)
       
-    # if !@resetted
-    #   reset_session
-    #   @resetted = true
-    # end
     #rails s -p $PORT -b $IP
-=begin
-    ##case1: empty movies
-    # if @movies==nil
-    #   @movies = Movie.all
-    # else
-    #   @movies = session[:movies]
-    # end
-    # params[:order] ||= session[:order]
-    # params["ratings"] ||= session[:filter]
-    session[:order] ||= params[:order]
-    session[:filter] ||= params["ratings"]
-
-    ##case2: sorted movies
-    ##case3: filtered movies
-    
-    #TASK 1: sort
-    if session[:order] == "Title"
-      @movies = Movie.order(:title)
-    elsif session[:order] == "Date"
-      @movies = Movie.order(:release_date) 
-    else
-      @movies = Movie.all
-    end
-    
-    #TASK 2: filter
-    @all_ratings = Movie.get_raitings #defined in Movie.rb
-    if session[:filter]  && !session[:filter].empty?
-      @movies &= Movie.where(:rating => session[:filter] .keys)
-    end
-    
-    session[:order] = params[:order]
-    session[:filter] = params["ratings"]
-=end
   end
 
   def new
