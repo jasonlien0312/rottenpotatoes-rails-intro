@@ -1,7 +1,9 @@
 class MoviesController < ApplicationController
-
+  
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
+    session[:fliter] = nil
+    session[:order] = nil
   end
 
   def show
@@ -30,39 +32,78 @@ class MoviesController < ApplicationController
   end
 
   def index
-    #rails s -p $PORT -b $IP
-# =begin
-    ##case1: empty movies
-    if @movies==nil
-      @movies = Movie.all
-    else
-      @movies = session[:movies]
+    #setting up variables
+    @all_ratings = Movie.get_raitings
+    if params.key?(:order)
+      session[:order] = params[:order]
+    elsif session.key?(:order)
+      params[:order] = session[:order]
+      redirect_to movies_path(params) and return
     end
+    
+    # @slected_ratings = params.key?("ratings") ? params["ratings"].keys : @all_ratings
+    
+    if params.key?("ratings")
+      session[:filter] = params["ratings"]
+      @slected_ratings = params["ratings"].keys
+    else
+      if params[:utf8]
+        @selected_ratings = []
+      elsif session.key?(:filter)
+        params["ratings"] = session[:filter]
+        redirect_to movies_path(params) and return
+      else
+        @selected_ratings = @all_ratings
+      end
+    end
+    
+    
+    @movies = Movie.order(params[:order]).where(:rating => @slected_ratings)
+      
+    # if !@resetted
+    #   reset_session
+    #   @resetted = true
+    # end
+    #rails s -p $PORT -b $IP
+=begin
+    ##case1: empty movies
+    # if @movies==nil
+    #   @movies = Movie.all
+    # else
+    #   @movies = session[:movies]
+    # end
+    # params[:order] ||= session[:order]
+    # params["ratings"] ||= session[:filter]
+    session[:order] ||= params[:order]
+    session[:filter] ||= params["ratings"]
 
     ##case2: sorted movies
     ##case3: filtered movies
     
     #TASK 1: sort
-    if params[:order] == "Title"
+    if session[:order] == "Title"
       @movies = Movie.order(:title)
-    elsif params[:order] == "Date"
+    elsif session[:order] == "Date"
       @movies = Movie.order(:release_date) 
-    # else
-    #   @movies = Movie.all
+    else
+      @movies = Movie.all
     end
     
     #TASK 2: filter
     @all_ratings = Movie.get_raitings #defined in Movie.rb
-    if params["ratings"]  && !params["ratings"].empty?
-      @movies &= Movie.where(:rating => params["ratings"].keys)
+    if session[:filter]  && !session[:filter].empty?
+      @movies &= Movie.where(:rating => session[:filter] .keys)
     end
     
-    session[:movies] = @movies
-# =end
+    session[:order] = params[:order]
+    session[:filter] = params["ratings"]
+=end
   end
 
   def new
     # default: render 'new' template
+    session[:fliter] = nil
+    session[:order] = nil
   end
 
   def create
@@ -87,6 +128,7 @@ class MoviesController < ApplicationController
     @movie.destroy
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
+    # session[:fliter] = nil
+    # session[:order] = nil
   end
-
 end
